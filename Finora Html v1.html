@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#315f52">
+<title>Finora — Standalone Prototype</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
+:root{
+  --bg:#f7f5ed; --card:#fbfaf6; --text:#29333a; --muted:#707775;
+  --border:#e5e1d6; --primary:#315f52; --primary2:#274d43;
+  --cream:#efe7d6; --accent:#d78369; --gold:#d4b56c;
+  --danger:#c8564d; --shadow:0 12px 35px rgba(49,95,82,.08);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:14px "DM Sans",system-ui,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+a{text-decoration:none;color:inherit}
+.app{min-height:100vh;display:flex}
+.sidebar{width:238px;background:var(--primary);color:#f8f5eb;position:fixed;inset:0 auto 0 0;padding:28px 16px;display:flex;flex-direction:column;z-index:10}
+.brand{display:flex;align-items:center;gap:11px;padding:4px 12px 30px;font:800 22px Manrope}
+.logo{width:38px;height:38px;border-radius:12px;background:#e6c982;color:#29333a;display:grid;place-items:center;font-weight:800}
+.nav{display:grid;gap:5px}
+.nav button{border:0;background:transparent;color:inherit;text-align:left;padding:12px 13px;border-radius:12px;font-weight:600;opacity:.82}
+.nav button:hover,.nav button.active{background:rgba(255,255,255,.09);opacity:1}
+.sidebar-foot{margin-top:auto;font-size:11px;line-height:1.6;opacity:.62;padding:12px}
+.main{margin-left:238px;width:calc(100% - 238px);padding:34px clamp(22px,4vw,58px) 90px}
+.wrap{max-width:1120px;margin:auto}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.eyebrow{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+h1,h2,h3{font-family:Manrope;margin:0}
+h1{font-size:clamp(28px,4vw,42px);letter-spacing:-.05em;margin-top:4px}
+h2{font-size:16px;letter-spacing:-.02em}
+.sub{color:var(--muted);margin-top:7px;line-height:1.5}
+.add{border:0;background:var(--primary);color:#fff;padding:12px 16px;border-radius:13px;font-weight:700;box-shadow:var(--shadow)}
+.add:hover{background:var(--primary2);transform:translateY(-1px)}
+.hero{background:var(--primary);color:#faf8f0;border-radius:24px;padding:28px 30px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;width:280px;height:280px;border-radius:50%;right:-120px;top:-150px;background:rgba(255,255,255,.06)}
+.hero .label{opacity:.72;font-size:12px;font-weight:600}
+.networth{font:800 clamp(36px,6vw,56px) Manrope;letter-spacing:-.06em;margin:6px 0 5px}
+.delta{font-size:12px;color:#e6c982}
+.grid{display:grid;gap:16px}
+.metrics{grid-template-columns:repeat(4,1fr);margin-top:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 3px 15px rgba(30,50,40,.025)}
+.metric .k{font-size:11px;color:var(--muted);font-weight:600}
+.metric .v{font:800 23px Manrope;margin-top:8px;letter-spacing:-.04em}
+.metric .hint{font-size:11px;color:var(--muted);margin-top:4px}
+.green{color:var(--primary)} .peach{color:var(--accent)} .red{color:var(--danger)}
+.two{grid-template-columns:1.2fr .8fr;margin-top:16px}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px}
+.card-head p{margin:5px 0 0;color:var(--muted);font-size:11px}
+.link{border:0;background:none;color:var(--primary);font-weight:700;font-size:12px}
+.bars{display:grid;gap:13px}
+.bar-row{display:grid;grid-template-columns:100px 1fr 65px;align-items:center;gap:10px;font-size:12px}
+.bar{height:8px;background:#ece8de;border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.commit{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}
+.commit:last-child{border:0}.commit b{font-size:12px}.commit span{font-size:11px;color:var(--muted)}
+.tx{margin-top:16px}
+.txlist{display:grid}
+.txrow{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)}
+.icon{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:#edf2ee;color:var(--primary);font-weight:800}
+.txrow .name{font-weight:700;font-size:12px}.txrow .date{font-size:10px;color:var(--muted);margin-top:3px}
+.txrow .amt{margin-left:auto;font-weight:800;font-family:Manrope}
+.bottom{display:none}
+.empty{padding:30px;text-align:center;background:#f2efe7;border-radius:14px;color:var(--muted)}
+.modal-back{position:fixed;inset:0;background:rgba(20,30,27,.42);display:none;align-items:flex-end;justify-content:center;z-index:30;padding:14px}
+.modal-back.show{display:flex}
+.modal{width:min(520px,100%);background:var(--card);border-radius:22px;padding:22px;box-shadow:0 25px 70px rgba(0,0,0,.2)}
+.modal h2{font-size:22px;margin-bottom:18px}
+.tabs{display:flex;background:#efede5;border-radius:12px;padding:4px;margin-bottom:16px}
+.tabs button{flex:1;border:0;background:none;padding:10px;border-radius:9px;font-weight:700;color:var(--muted)}
+.tabs button.active{background:#fff;color:var(--primary);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.field{display:grid;gap:6px;margin:12px 0}.field label{font-size:11px;color:var(--muted);font-weight:700}
+.field input,.field select{height:48px;border:1px solid var(--border);border-radius:12px;background:#fff;padding:0 13px;outline:0}
+.field input:focus,.field select:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(49,95,82,.1)}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.secondary{border:1px solid var(--border);background:#fff;padding:11px 15px;border-radius:11px;font-weight:700}
+.primary{border:0;background:var(--primary);color:#fff;padding:11px 17px;border-radius:11px;font-weight:700}
+.onboard{position:fixed;inset:0;background:var(--bg);z-index:50;display:none;place-items:center;padding:20px}
+.onboard.show{display:grid}
+.setup{width:min(560px,100%)}.setup-logo{display:flex;gap:10px;align-items:center;font:800 20px Manrope;margin-bottom:45px}
+.setup h1{font-size:clamp(34px,8vw,52px)}.setup p{color:var(--muted);line-height:1.7;max-width:470px}
+.setup-box{margin-top:28px;padding:18px;border:1px solid var(--border);border-radius:18px;background:var(--card)}
+.setup-box input{width:100%;height:58px;border:1px solid var(--border);border-radius:13px;font:800 24px Manrope;padding:0 16px}
+.setup-actions{display:flex;gap:9px;justify-content:flex-end;margin-top:16px}
+.progress{height:4px;background:#e9e5db;border-radius:99px;margin-bottom:42px}.progress i{display:block;height:100%;width:50%;background:var(--primary);border-radius:99px}
+@media(max-width:850px){
+ .sidebar{display:none}.main{margin:0;width:100%;padding:24px 16px 100px}
+ .metrics{grid-template-columns:repeat(2,1fr)}
+ .two{grid-template-columns:1fr}
+ .bottom{display:flex;position:fixed;z-index:20;left:10px;right:10px;bottom:10px;background:rgba(49,95,82,.97);border-radius:18px;padding:7px;box-shadow:0 12px 35px rgba(20,50,40,.22)}
+ .bottom button{flex:1;background:none;border:0;color:#f5f3e9;font-size:10px;font-weight:700;padding:9px 3px;border-radius:12px}
+ .bottom button.active{background:rgba(255,255,255,.1)}
+ .bottom .fab{background:#e6c982;color:#29333a;margin-top:-24px;box-shadow:0 7px 20px rgba(0,0,0,.18);font-size:18px}
+ .top{align-items:flex-end}.top .add{display:none}
+ .hero{padding:24px}.networth{font-size:42px}
+}
+@media(max-width:420px){.bar-row{grid-template-columns:82px 1fr 58px}.card{padding:16px}.metrics{gap:10px}.metric .v{font-size:20px}}
+</style>
+</head>
+<body>
+<div id="onboard" class="onboard">
+  <div class="setup">
+    <div class="setup-logo"><span class="logo">F</span>finora</div>
+    <div class="progress"><i></i></div>
+    <div id="setupContent"></div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">F</span>finora</div>
+    <div class="nav">
+      <button class="active">Overview</button>
+      <button>Money</button><button>Investments</button><button>Goals</button>
+      <button>Future</button><button>Recurring</button><button>Liabilities</button>
+      <button>Reports</button><button>Settings</button>
+    </div>
+    <div class="sidebar-foot">Your financial data stays on this device.<br>Standalone local-first prototype.</div>
+  </aside>
+
+  <main class="main">
+    <div class="wrap">
+      <div class="top">
+        <div><div class="eyebrow">Monday · September 2026</div><h1>Your financial life.</h1><div class="sub">A clear picture of where you are today.</div></div>
+        <button class="add" onclick="openAdd()">+ Add</button>
+      </div>
+
+      <section class="hero">
+        <div class="label">NET WORTH</div>
+        <div class="networth" id="networth">₹0</div>
+        <div class="delta" id="netDelta">Assets minus liabilities</div>
+      </section>
+
+      <div class="grid metrics">
+        <div class="card metric"><div class="k">THIS MONTH · INCOME</div><div class="v green" id="income">₹0</div><div class="hint">Actual transactions</div></div>
+        <div class="card metric"><div class="k">SPENDING</div><div class="v peach" id="spending">₹0</div><div class="hint">Actual expenses</div></div>
+        <div class="card metric"><div class="k">INVESTED</div><div class="v" id="invested">₹0</div><div class="hint">Contributions</div></div>
+        <div class="card metric"><div class="k">SURPLUS</div><div class="v green" id="surplus">₹0</div><div class="hint">Income − spending − invested</div></div>
+      </div>
+
+      <div class="grid two">
+        <section class="card">
+          <div class="card-head"><div><h2>Spending by category</h2><p>Current month · actual spending</p></div><button class="link">View all</button></div>
+          <div id="bars" class="bars"><div class="empty">No expenses recorded yet.</div></div>
+        </section>
+        <section class="card">
+          <div class="card-head"><div><h2>Expected commitments</h2><p>Separate from actual transactions</p></div><button class="link">Manage</button></div>
+          <div class="commit"><div><b>Recurring income</b><br><span>Expected this month</span></div><strong class="green" id="recIncome">₹0</strong></div>
+          <div class="commit"><div><b>Recurring expenses</b><br><span>Expected this month</span></div><strong id="recExpense">₹0</strong></div>
+          <div class="commit"><div><b>Investments</b><br><span>Expected contribution</span></div><strong id="recInvest">₹0</strong></div>
+        </section>
+      </div>
+
+      <section class="card tx">
+        <div class="card-head"><div><h2>Latest this month</h2><p>Actual transactions only</p></div><button class="link">See month</button></div>
+        <div id="txlist" class="txlist"><div class="empty">No actual transactions yet.<br>Tap + Add when money moves.</div></div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<nav class="bottom">
+  <button class="active">⌂<br>Overview</button>
+  <button>☰<br>Money</button>
+  <button class="fab" onclick="openAdd()">+</button>
+  <button>◎<br>Future</button>
+  <button>•••<br>More</button>
+</nav>
+
+<div id="modalBack" class="modal-back" onclick="if(event.target===this)closeAdd()">
+  <div class="modal">
+    <h2>Add a transaction</h2>
+    <div class="tabs">
+      <button id="expenseTab" class="active" onclick="setType('expense')">Expense</button>
+      <button id="incomeTab" onclick="setType('income')">Income</button>
+      <button id="investTab" onclick="setType('investment')">Investment</button>
+      <button id="withdrawTab" onclick="setType('withdrawal')">Withdrawal</button>
+    </div>
+    <div class="field"><label>AMOUNT</label><input id="amount" type="number" min="0" inputmode="decimal" placeholder="0"></div>
+    <div class="field"><label>CATEGORY</label><select id="category"><option>Food</option><option>Shopping</option><option>Transport</option><option>Entertainment</option><option>Rent</option><option>Other</option></select></div>
+    <div class="field"><label>DATE</label><input id="date" type="date"></div>
+    <div class="field"><label>NOTE (OPTIONAL)</label><input id="note" placeholder="What was this for?"></div>
+    <div class="modal-actions"><button class="secondary" onclick="closeAdd()">Cancel</button><button class="primary" onclick="saveTx()">Save transaction</button></div>
+  </div>
+</div>
+
+<script>
+const KEY='finora-standalone-v1';
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{
+  setup:false, cash:0, investments:0, debt:0, recurringIncome:0, recurringExpense:0, recurringInvestment:0, transactions:[]
+};
+let type='expense';
+
+const money=n=>new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(n||0);
+const today=()=>new Date().toISOString().slice(0,10);
+const month=()=>today().slice(0,7);
+function persist(){localStorage.setItem(KEY,JSON.stringify(state));}
+function render(){
+  const m=month(), tx=state.transactions.filter(x=>x.date.slice(0,7)===m);
+  const income=tx.filter(x=>x.type==='income').reduce((a,x)=>a+x.amount,0);
+  const spending=tx.filter(x=>x.type==='expense').reduce((a,x)=>a+x.amount,0);
+  const invested=tx.filter(x=>x.type==='investment').reduce((a,x)=>a+x.amount,0);
+  const withdrawals=tx.filter(x=>x.type==='withdrawal').reduce((a,x)=>a+x.amount,0);
+  const investmentBalance=state.investments+invested-withdrawals;
+  const cash=state.cash+income-spending-invested+withdrawals;
+  const net=cash+investmentBalance-state.debt;
+  document.getElementById('networth').textContent=money(net);
+  document.getElementById('income').textContent=money(income);
+  document.getElementById('spending').textContent=money(spending);
+  document.getElementById('invested').textContent=money(invested);
+  document.getElementById('surplus').textContent=money(income-spending-invested);
+  document.getElementById('recIncome').textContent=money(state.recurringIncome);
+  document.getElementById('recExpense').textContent=money(state.recurringExpense);
+  document.getElementById('recInvest').textContent=money(state.recurringInvestment);
+  const by={}; tx.filter(x=>x.type==='expense').forEach(x=>by[x.category]=(by[x.category]||0)+x.amount);
+  const cats=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,5), max=cats[0]?.[1]||1;
+  document.getElementById('bars').innerHTML=cats.length?cats.map(([k,v])=>`<div class="bar-row"><span>${k}</span><div class="bar"><i style="width:${v/max*100}%"></i></div><b>${money(v)}</b></div>`).join(''):'<div class="empty">No expenses recorded yet.</div>';
+  const list=[...tx].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+  document.getElementById('txlist').innerHTML=list.length?list.map(x=>{
+    const sign=x.type==='income'||x.type==='withdrawal'?'+':'−';
+    return `<div class="txrow"><div class="icon">${x.type==='expense'?'↗':x.type==='income'?'↙':x.type==='investment'?'◆':'↙'}</div><div><div class="name">${x.category}</div><div class="date">${x.date}${x.note?' · '+x.note:''}</div></div><div class="amt ${x.type==='expense'?'peach':'green'}">${sign}${money(x.amount)}</div></div>`;
+  }).join(''):'<div class="empty">No actual transactions yet.<br>Tap + Add when money moves.</div>';
+}
+function openAdd(){document.getElementById('modalBack').classList.add('show');document.getElementById('date').value=today();document.getElementById('amount').focus()}
+function closeAdd(){document.getElementById('modalBack').classList.remove('show')}
+function setType(t){
+ type=t;
+ ['expense','income','invest','withdraw'].forEach(id=>document.getElementById(id+'Tab').classList.remove('active'));
+ document.getElementById(t==='investment'?'investTab':t==='withdrawal'?'withdrawTab':t+'Tab').classList.add('active');
+}
+function saveTx(){
+ const amount=Number(document.getElementById('amount').value);
+ if(!amount||amount<0)return alert('Enter a valid amount.');
+ const tx={id:Date.now(),type,amount,category:document.getElementById('category').value,date:document.getElementById('date').value||today(),note:document.getElementById('note').value.trim()};
+ state.transactions.push(tx);persist();render();closeAdd();
+ document.getElementById('amount').value='';document.getElementById('note').value='';
+}
+function setupStart(){
+ if(state.setup){document.getElementById('onboard').classList.remove('show');return}
+ document.getElementById('onboard').classList.add('show');
+ document.getElementById('setupContent').innerHTML=`
+   <h1>Let's set up your Finora.</h1>
+   <p>A few real numbers are enough to create your starting financial picture. You can add more detail later.</p>
+   <div class="setup-box"><label style="display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px">CURRENT CASH / BANK BALANCE</label><input id="setupCash" type="number" inputmode="decimal" placeholder="₹ 0"></div>
+   <div class="setup-actions"><button class="secondary" onclick="finishSetup()">Skip for now</button><button class="primary" onclick="finishSetup()">Continue</button></div>`;
+}
+function finishSetup(){
+ state.cash=Number(document.getElementById('setupCash')?.value||0);state.setup=true;persist();document.getElementById('onboard').classList.remove('show');render();
+}
+setupStart();render();
+</script>
+</body>
+</html>

@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#315f52">
+<title>Finora — Personal Finance</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
+:root{
+ --bg:#f7f5ed;--card:#fbfaf6;--text:#29333a;--muted:#707775;--border:#e5e1d6;
+ --primary:#315f52;--primary2:#274d43;--cream:#efe7d6;--accent:#d78369;--gold:#d4b56c;
+ --danger:#c8564d;--success:#315f52;--shadow:0 10px 30px rgba(49,95,82,.07);--r:18px
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:14px "DM Sans",system-ui,sans-serif}
+button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}
+h1,h2,h3,h4{font-family:Manrope;margin:0}h1{font-size:clamp(28px,4vw,42px);letter-spacing:-.05em}h2{font-size:18px;letter-spacing:-.03em}h3{font-size:15px}
+.app{min-height:100vh}.sidebar{width:238px;background:var(--primary);color:#f8f5eb;position:fixed;inset:0 auto 0 0;padding:25px 15px;display:flex;flex-direction:column;z-index:20}
+.brand{display:flex;align-items:center;gap:11px;padding:4px 12px 28px;font:800 22px Manrope}.logo{width:38px;height:38px;border-radius:12px;background:#e6c982;color:#29333a;display:grid;place-items:center;font-weight:800}
+.nav{display:grid;gap:4px}.nav button{border:0;background:transparent;color:inherit;text-align:left;padding:11px 13px;border-radius:12px;font-weight:600;opacity:.8}.nav button:hover,.nav button.active{background:rgba(255,255,255,.1);opacity:1}
+.side-note{margin-top:auto;padding:12px;font-size:11px;line-height:1.55;opacity:.6}.main{margin-left:238px;padding:32px clamp(18px,4vw,56px) 92px}.wrap{max-width:1160px;margin:auto}
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:25px}.eyebrow{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:700}.sub{color:var(--muted);margin-top:7px;line-height:1.5}
+.btn{border:1px solid var(--border);background:#fff;color:var(--text);padding:10px 14px;border-radius:12px;font-weight:700}.btn.primary{border-color:var(--primary);background:var(--primary);color:#fff}.btn.danger{border-color:#efcbc7;color:var(--danger);background:#fff}.btn.ghost{background:transparent}
+.grid{display:grid;gap:15px}.hero{background:var(--primary);color:#faf8f0;border-radius:24px;padding:28px 30px;box-shadow:var(--shadow);position:relative;overflow:hidden}.hero:after{content:"";position:absolute;width:320px;height:320px;border-radius:50%;right:-140px;top:-170px;background:rgba(255,255,255,.06)}
+.hero .label{opacity:.7;font-size:11px;font-weight:700;letter-spacing:.08em}.networth{font:800 clamp(36px,6vw,56px) Manrope;letter-spacing:-.06em;margin:5px 0}.hero-meta{display:flex;gap:18px;flex-wrap:wrap;font-size:11px;opacity:.82}.hero-meta b{color:#e6c982}
+.metrics{grid-template-columns:repeat(4,1fr);margin-top:15px}.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:19px;box-shadow:0 2px 13px rgba(30,50,40,.025)}
+.metric .k{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.04em}.metric .v{font:800 23px Manrope;margin-top:8px;letter-spacing:-.04em}.metric .hint{font-size:10px;color:var(--muted);margin-top:4px}.green{color:var(--primary)}.peach{color:var(--accent)}.red{color:var(--danger)}
+.two{grid-template-columns:1.2fr .8fr;margin-top:15px}.three{grid-template-columns:repeat(3,1fr);margin-top:15px}.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:17px}.card-head p{margin:4px 0 0;color:var(--muted);font-size:11px}.link{border:0;background:none;color:var(--primary);font-weight:700;font-size:11px;padding:4px}
+.bar-list{display:grid;gap:13px}.bar-row{display:grid;grid-template-columns:95px 1fr 70px;align-items:center;gap:9px;font-size:11px}.bar{height:8px;background:#ece8de;border-radius:99px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.commit,.list-row{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)}.commit:last-child,.list-row:last-child{border-bottom:0}.commit .right,.list-row .right{margin-left:auto;text-align:right}.small{font-size:10px;color:var(--muted)}.strong{font-weight:800}.tx-icon{width:35px;height:35px;border-radius:11px;background:#edf2ee;color:var(--primary);display:grid;place-items:center;font-weight:800;flex:none}.tx-title{font-size:12px;font-weight:700}.tx-date{font-size:10px;color:var(--muted);margin-top:3px}.empty{padding:28px;text-align:center;background:#f2efe7;border-radius:14px;color:var(--muted);line-height:1.6}
+.page{display:none}.page.active{display:block}.section-gap{margin-top:15px}.section-title{margin:25px 0 12px}.pill{display:inline-flex;align-items:center;padding:5px 8px;border-radius:99px;background:#efede5;color:var(--muted);font-size:10px;font-weight:700}
+.month-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.month-nav button{width:36px;height:36px;border:1px solid var(--border);background:#fff;border-radius:11px;font-weight:800}
+.summary-grid{grid-template-columns:repeat(4,1fr)}.summary-number{font:800 22px Manrope;margin-top:5px}
+.table-wrap{overflow:auto}.table{width:100%;border-collapse:collapse;min-width:560px}.table th,.table td{text-align:left;padding:12px 8px;border-bottom:1px solid var(--border);font-size:11px}.table th{color:var(--muted);font-size:10px;text-transform:uppercase}.table td:last-child,.table th:last-child{text-align:right}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:11px}.field{display:grid;gap:6px}.field.full{grid-column:1/-1}.field label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}.field input,.field select,.field textarea{width:100%;height:44px;border:1px solid var(--border);border-radius:11px;background:#fff;padding:0 12px;outline:0;color:var(--text)}.field textarea{height:80px;padding:10px;resize:vertical}.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(49,95,82,.1)}
+.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px;flex-wrap:wrap}.stack{display:grid;gap:10px}
+.account-card{display:flex;align-items:center;gap:12px}.account-icon{width:40px;height:40px;border-radius:12px;background:var(--cream);display:grid;place-items:center;color:var(--primary);font-weight:800}.account-card .value{margin-left:auto;text-align:right}.value b{font:800 17px Manrope}.value small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.goal{display:grid;gap:8px}.goal-top{display:flex;justify-content:space-between;gap:10px}.progress{height:9px;background:#e9e5db;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:var(--primary);border-radius:99px}.goal-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+.range-row{display:grid;grid-template-columns:1fr 70px;gap:12px;align-items:center}.range-row input[type=range]{width:100%;accent-color:var(--primary)}.rate{font-weight:800;text-align:right}.scenario{display:flex;gap:7px;flex-wrap:wrap}.scenario button{border:1px solid var(--border);background:#fff;padding:8px 10px;border-radius:10px;font-size:10px;font-weight:700}.scenario button.active{background:var(--primary);border-color:var(--primary);color:#fff}
+.chart{width:100%;height:260px}.chart svg{width:100%;height:100%;overflow:visible}.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:10px;color:var(--muted)}.legend span:before{content:"";display:inline-block;width:9px;height:9px;border-radius:3px;background:currentColor;margin-right:5px}
+.notice{padding:12px 14px;border-radius:12px;background:#f2efe7;color:var(--muted);font-size:11px;line-height:1.55}.notice b{color:var(--text)}
+.unlock{padding:32px;text-align:center;background:var(--primary);color:#fff;border-radius:22px}.unlock h2{font-size:27px}.unlock p{max-width:550px;margin:10px auto 20px;opacity:.8;line-height:1.6}
+.toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);background:#29333a;color:#fff;padding:11px 15px;border-radius:12px;font-size:11px;opacity:0;pointer-events:none;transition:.2s;z-index:100}.toast.show{opacity:1;transform:translate(-50%,0)}
+.modal-back{position:fixed;inset:0;background:rgba(20,30,27,.44);display:none;align-items:flex-end;justify-content:center;z-index:80;padding:14px}.modal-back.show{display:flex}.modal{width:min(620px,100%);max-height:92vh;overflow:auto;background:var(--card);border-radius:22px;padding:22px;box-shadow:0 25px 70px rgba(0,0,0,.22)}.modal h2{font-size:22px;margin-bottom:17px}
+.add-tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;background:#efede5;padding:4px;border-radius:12px;margin-bottom:16px}.add-tabs button{border:0;background:none;padding:9px 4px;border-radius:9px;font-size:10px;font-weight:800;color:var(--muted)}.add-tabs button.active{background:#fff;color:var(--primary);box-shadow:0 2px 7px rgba(0,0,0,.05)}
+.onboard{position:fixed;inset:0;background:var(--bg);z-index:120;display:none;place-items:center;padding:20px}.onboard.show{display:grid}.setup{width:min(650px,100%)}.setup-brand{display:flex;align-items:center;gap:10px;font:800 21px Manrope;margin-bottom:35px}.setup-brand .logo{width:35px;height:35px}.setup-progress{height:4px;background:#e9e5db;border-radius:99px;margin-bottom:35px}.setup-progress i{display:block;height:100%;background:var(--primary);border-radius:99px;transition:.2s}.setup h1{font-size:clamp(30px,7vw,48px)}.setup .lead{color:var(--muted);line-height:1.7;max-width:540px}.setup-card{margin-top:24px;background:var(--card);border:1px solid var(--border);border-radius:19px;padding:19px}.setup-actions{display:flex;justify-content:space-between;gap:8px;margin-top:15px}.setup-actions .right{display:flex;gap:7px}
+.bottom{display:none}
+@media(max-width:900px){.sidebar{display:none}.main{margin-left:0;padding:24px 15px 95px}.metrics{grid-template-columns:repeat(2,1fr)}.summary-grid{grid-template-columns:repeat(2,1fr)}.two,.three{grid-template-columns:1fr}.bottom{display:flex;position:fixed;z-index:60;left:9px;right:9px;bottom:9px;background:rgba(49,95,82,.97);border-radius:18px;padding:7px;box-shadow:0 12px 35px rgba(20,50,40,.22)}.bottom button{flex:1;border:0;background:none;color:#f5f3e9;font-size:9px;font-weight:700;padding:8px 2px;border-radius:11px}.bottom button.active{background:rgba(255,255,255,.1)}.bottom .fab{background:#e6c982;color:#29333a;margin-top:-24px;box-shadow:0 7px 20px rgba(0,0,0,.18);font-size:19px}.top .desktop-add{display:none}}
+@media(max-width:460px){.metrics{gap:9px}.metric .v{font-size:19px}.card{padding:16px}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.bar-row{grid-template-columns:78px 1fr 60px}.add-tabs{grid-template-columns:repeat(2,1fr)}.hero{padding:23px}.networth{font-size:40px}}
+</style>
+</head>
+<body>
+
+<div id="onboarding" class="onboard">
+  <div class="setup">
+    <div class="setup-brand"><span class="logo">F</span>finora</div>
+    <div class="setup-progress"><i id="setupProgress"></i></div>
+    <div id="setupContent"></div>
+  </div>
+</div>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><span class="logo">F</span>finora</div>
+    <div class="nav">
+      <button data-page="overview" class="active">Overview</button>
+      <button data-page="money">Money</button>
+      <button data-page="investments">Investments</button>
+      <button data-page="goals">Goals</button>
+      <button data-page="future">Future</button>
+      <button data-page="recurring">Recurring</button>
+      <button data-page="liabilities">Liabilities</button>
+      <button data-page="reports">Reports</button>
+      <button data-page="settings">Settings</button>
+    </div>
+    <div class="side-note">Your financial data stays on this device.<br>Local-first Finora.</div>
+  </aside>
+
+  <main class="main">
+    <div class="wrap">
+
+      <!-- OVERVIEW -->
+      <section id="page-overview" class="page active">
+        <div class="top">
+          <div><div class="eyebrow" id="todayLabel"></div><h1>Your financial life.</h1><div class="sub">A clear picture of where you are today.</div></div>
+          <button class="btn primary desktop-add" onclick="openAdd()">+ Add</button>
+        </div>
+        <section class="hero">
+          <div class="label">NET WORTH</div>
+          <div class="networth" id="ovNetWorth">₹0</div>
+          <div class="hero-meta"><span>Assets <b id="ovAssets">₹0</b></span><span>Liabilities <b id="ovLiabilities">₹0</b></span></div>
+        </section>
+        <div class="grid metrics">
+          <div class="card metric"><div class="k">THIS MONTH · INCOME</div><div class="v green" id="ovIncome">₹0</div><div class="hint">Actual transactions</div></div>
+          <div class="card metric"><div class="k">SPENDING</div><div class="v peach" id="ovSpending">₹0</div><div class="hint">Actual expenses</div></div>
+          <div class="card metric"><div class="k">INVESTED</div><div class="v" id="ovInvested">₹0</div><div class="hint">Actual contributions</div></div>
+          <div class="card metric"><div class="k">SURPLUS</div><div class="v green" id="ovSurplus">₹0</div><div class="hint">Income − spending − invested</div></div>
+        </div>
+        <div class="grid two section-gap">
+          <section class="card">
+            <div class="card-head"><div><h2>Spending by category</h2><p>Current month · actual spending</p></div><button class="link" onclick="showPage('money')">View all</button></div>
+            <div id="ovBars" class="bar-list"></div>
+          </section>
+          <section class="card">
+            <div class="card-head"><div><h2>Expected commitments</h2><p>Recurring definitions, not transactions</p></div><button class="link" onclick="showPage('recurring')">Manage</button></div>
+            <div id="ovCommitments"></div>
+          </section>
+        </div>
+        <div class="grid two section-gap">
+          <section class="card"><div class="card-head"><div><h2>Cash & investments</h2><p>Tracked balances</p></div></div><div id="ovAccounts" class="stack"></div></section>
+          <section class="card"><div class="card-head"><div><h2>Top goals</h2><p>Progress toward your targets</p></div><button class="link" onclick="showPage('goals')">View all</button></div><div id="ovGoals" class="stack"></div></section>
+        </div>
+        <section class="card section-gap"><div class="card-head"><div><h2>Latest transactions</h2><p>Actual financial activity</p></div><button class="link" onclick="showPage('money')">See month</button></div><div id="ovTransactions"></div></section>
+      </section>
+
+      <!-- MONEY -->
+      <section id="page-money" class="page">
+        <div class="top"><div><div class="eyebrow">Money</div><h1>Monthly view.</h1><div class="sub">Income, spending and actual money movement.</div></div><button class="btn primary desktop-add" onclick="openAdd()">+ Add</button></div>
+        <div class="month-nav"><button onclick="shiftMonth(-1)">‹</button><div><h2 id="moneyMonth"></h2><div class="small" style="text-align:center">Transactions are grouped automatically by date</div></div><button onclick="shiftMonth(1)">›</button></div>
+        <div class="grid summary-grid">
+          <div class="card"><div class="small">INCOME</div><div class="summary-number green" id="mIncome">₹0</div></div>
+          <div class="card"><div class="small">SPENDING</div><div class="summary-number peach" id="mSpending">₹0</div></div>
+          <div class="card"><div class="small">INVESTED</div><div class="summary-number" id="mInvested">₹0</div></div>
+          <div class="card"><div class="small">SURPLUS</div><div class="summary-number green" id="mSurplus">₹0</div></div>
+        </div>
+        <section class="card section-gap"><div class="card-head"><div><h2>Transactions</h2><p id="moneyCount"></p></div><button class="btn primary" onclick="openAdd()">+ Add</button></div><div id="moneyTransactions"></div></section>
+      </section>
+
+      <!-- INVESTMENTS -->
+      <section id="page-investments" class="page">
+        <div class="top"><div><div class="eyebrow">Investments</div><h1>Your portfolio.</h1><div class="sub">Tracked balances from your opening position and actual movements.</div></div><button class="btn primary" onclick="openAccountModal()">+ Account</button></div>
+        <section class="hero"><div class="label">TOTAL TRACKED INVESTMENTS</div><div class="networth" id="invTotal">₹0</div><div class="hero-meta">Not a live market valuation.</div></section>
+        <div id="investmentAccounts" class="grid two section-gap"></div>
+        <section class="card section-gap"><div class="card-head"><div><h2>Investment activity</h2><p>Contributions and withdrawals affecting tracked balances</p></div><button class="link" onclick="showPage('money')">View transactions</button></div><div id="investmentActivity"></div></section>
+      </section>
+
+      <!-- GOALS -->
+      <section id="page-goals" class="page">
+        <div class="top"><div><div class="eyebrow">Goals</div><h1>What are you building toward?</h1><div class="sub">Track target amounts and dates without losing sight of today.</div></div><button class="btn primary" onclick="openGoalModal()">+ Goal</button></div>
+        <div id="goalsList" class="grid two"></div>
+      </section>
+
+      <!-- FUTURE -->
+      <section id="page-future" class="page">
+        <div class="top"><div><div class="eyebrow">Future · Financial Outlook</div><h1>See where this can lead.</h1><div class="sub">Projection only. Your actual financial records are never changed.</div></div></div>
+        <div id="futureContent"></div>
+      </section>
+
+      <!-- RECURRING -->
+      <section id="page-recurring" class="page">
+        <div class="top"><div><div class="eyebrow">Recurring</div><h1>Expected commitments.</h1><div class="sub">Definitions used for upcoming commitments and projections. They are not transactions.</div></div><button class="btn primary" onclick="openRecurringModal()">+ Recurring</button></div>
+        <div class="grid three" id="recurringSummary"></div>
+        <section class="card section-gap"><div class="card-head"><div><h2>Recurring items</h2><p>Monthly, quarterly and yearly definitions</p></div></div><div id="recurringList"></div></section>
+      </section>
+
+      <!-- LIABILITIES -->
+      <section id="page-liabilities" class="page">
+        <div class="top"><div><div class="eyebrow">Liabilities</div><h1>Debt, clearly.</h1><div class="sub">Outstanding balances are included in net worth and loan details feed projections.</div></div><button class="btn primary" onclick="openLiabilityModal()">+ Liability</button></div>
+        <section class="hero"><div class="label">TOTAL OUTSTANDING</div><div class="networth" id="liabTotal">₹0</div></section>
+        <section class="card section-gap"><div id="liabilityList"></div></section>
+      </section>
+
+      <!-- REPORTS -->
+      <section id="page-reports" class="page">
+        <div class="top"><div><div class="eyebrow">Reports</div><h1>Understand the pattern.</h1><div class="sub">Actual transaction history only.</div></div></div>
+        <section class="card"><div class="card-head"><div><h2>Income vs spending</h2><p>Last six calendar months</p></div></div><div id="reportTrend" class="chart"></div></section>
+        <div class="grid two section-gap">
+          <section class="card"><div class="card-head"><div><h2>Current-month spending</h2><p>By category</p></div></div><div id="reportCategories"></div></section>
+          <section class="card"><div class="card-head"><div><h2>Current-month summary</h2><p>Actual activity</p></div></div><div id="reportSummary"></div></section>
+        </div>
+      </section>
+
+      <!-- SETTINGS -->
+      <section id="page-settings" class="page">
+        <div class="top"><div><div class="eyebrow">Settings & Data</div><h1>Your data, your control.</h1><div class="sub">Finora is local-first. Your financial data stays on this device.</div></div></div>
+        <section class="card"><div class="card-head"><div><h2>Display</h2><p>Currency selection changes display only.</p></div></div>
+          <div class="form-grid"><div class="field"><label>Display currency</label><select id="currencySelect" onchange="changeCurrency(this.value)"><option>INR</option><option>USD</option><option>GBP</option><option>EUR</option><option>AUD</option><option>CAD</option><option>SGD</option></select></div></div>
+        </section>
+        <section class="card section-gap"><div class="card-head"><div><h2>Financial profile</h2><p>Edit your setup values without losing transaction history.</p></div><button class="btn primary" onclick="openProfileModal()">Edit profile</button></div><div id="settingsProfile"></div></section>
+        <section class="card section-gap"><div class="card-head"><div><h2>Data portability</h2><p>Export a complete JSON backup or restore one with schema validation.</p></div></div><div class="actions" style="justify-content:flex-start"><button class="btn primary" onclick="exportData()">Export JSON</button><button class="btn" onclick="document.getElementById('importFile').click()">Import JSON</button><input id="importFile" type="file" accept=".json,application/json" hidden onchange="importData(event)"></div></section>
+        <section class="card section-gap"><div class="card-head"><div><h2>Delete all data</h2><p>This clears local Finora data and returns the app to first-time setup.</p></div></div><button class="btn danger" onclick="deleteAllData()">Delete all data</button></section>
+      </section>
+    </div>
+  </main>
+</div>
+
+<nav class="bottom">
+ <button data-page="overview" class="active">⌂<br>Overview</button>
+ <button data-page="money">☰<br>Money</button>
+ <button class="fab" onclick="openAdd()">+</button>
+ <button data-page="future">◎<br>Future</button>
+ <button data-page="more">•••<br>More</button>
+</nav>
+
+<div id="toast" class="toast"></div>
+
+<!-- Transaction modal -->
+<div id="txModal" class="modal-back" onclick="if(event.target===this)closeModal('txModal')"><div class="modal">
+ <h2>Add a transaction</h2>
+ <div class="add-tabs">
+  <button class="active" data-type="expense" onclick="setTxType('expense')">Expense</button>
+  <button data-type="income" onclick="setTxType('income')">Income</button>
+  <button data-type="investment_contribution" onclick="setTxType('investment_contribution')">Investment</button>
+  <button data-type="withdrawal" onclick="setTxType('withdrawal')">Withdrawal</button>
+ </div>
+ <div id="txForm"></div>
+</div></div>
+
+<!-- Generic modal -->
+<div id="genericModal" class="modal-back" onclick="if(event.target===this)closeModal('genericModal')"><div class="modal"><div id="genericContent"></div></div></div>
+
+<script>
+const STORE='finora-static-v1';
+const VERSION=2;
+const CURRENCIES={INR:{symbol:'₹',locale:'en-IN'},USD:{symbol:'$',locale:'en-US'},GBP:{symbol:'£',locale:'en-GB'},EUR:{symbol:'€',locale:'de-DE'},AUD:{symbol:'A$',locale:'en-AU'},CAD:{symbol:'C$',locale:'en-CA'},SGD:{symbol:'S$',locale:'en-SG'}};
+const EXPENSE_CATS=['Housing','EMI','Food','Transport','Shopping','Entertainment','Travel','Utilities','Insurance','Other'];
+const INCOME_CATS=['Salary','Freelance / Business','Bonus','Interest','Dividends','Other income','Other'];
+const INVESTMENT_CATS=['Mutual Funds','Stocks','ETF','EPF','PPF','NPS','FD / RD','Gold','Other'];
+const LIAB_TYPES=['Home Loan','Car Loan','Personal Loan','Education Loan','Credit Card','Other'];
+const uid=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
+const today=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10)};
+const money=n=>{const c=CURRENCIES[state.settings.currency]||CURRENCIES.INR;return new Intl.NumberFormat(c.locale,{style:'currency',currency:state.settings.currency,maximumFractionDigits:0}).format(Number(n)||0)};
+const monthKey=d=>String(d||today()).slice(0,7);
+const monthName=k=>new Date(k+'-01T12:00:00').toLocaleDateString(undefined,{month:'long',year:'numeric'});
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+function defaultState(){return {version:VERSION,onboardingCompleted:false,setupDate:null,settings:{currency:'INR'},profile:{},accounts:[],transactions:[],recurringItems:[],liabilities:[],goals:[],futureUnlocked:false}}
+let state=load();
+function load(){try{const x=JSON.parse(localStorage.getItem(STORE));return x&&x.version?migrate(x):defaultState()}catch{return defaultState()}}
+function migrate(x){x.version=VERSION;x.settings=x.settings||{currency:'INR'};x.profile=x.profile||{};x.accounts=x.accounts||[];x.transactions=x.transactions||[];x.recurringItems=x.recurringItems||[];x.liabilities=x.liabilities||[];x.goals=x.goals||[];x.futureUnlocked=!!x.futureUnlocked;return x}
+function save(){localStorage.setItem(STORE,JSON.stringify(state))}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.__toast);window.__toast=setTimeout(()=>t.classList.remove('show'),1800)}
+function showPage(page){
+ if(page==='more'){page='settings'}
+ document.querySelectorAll('.page').forEach(x=>x.classList.toggle('active',x.id==='page-'+page));
+ document.querySelectorAll('[data-page]').forEach(x=>x.classList.toggle('active',x.dataset.page===page));
+ window.scrollTo({top:0,behavior:'smooth'});renderPage(page)
+}
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+function openModal(id){document.getElementById(id).classList.add('show')}
+function netWorth(){
+ const assets=state.accounts.reduce((s,a)=>s+accountBalance(a.id),0);
+ const liab=state.liabilities.reduce((s,l)=>s+Number(l.currentOutstanding||0),0);
+ return {assets,liab,net:assets-liab}
+}
+function accountBalance(id){
+ const a=state.accounts.find(x=>x.id===id);if(!a)return 0;
+ let v=Number(a.openingBalance||0);
+ state.transactions.filter(t=>t.accountId===id).forEach(t=>{
+   if(t.type==='investment_contribution')v+=Number(t.amount||0);
+   if(t.type==='withdrawal')v-=Number(t.amount||0);
+   if(t.type==='adjustment')v+=Number(t.amount||0);
+ });
+ return v;
+}
+function cashBalance(){
+ let v=state.accounts.filter(a=>a.type==='cash').reduce((s,a)=>s+accountBalance(a.id),0);
+ state.transactions.forEach(t=>{
+   if(t.type==='income')v+=Number(t.amount||0);
+   if(t.type==='expense')v-=Number(t.amount||0);
+   if(t.type==='investment_contribution')v-=Number(t.amount||0);
+   if(t.type==='withdrawal')v+=Number(t.amount||0);
+ });
+ return v;
+}
+function investmentTotal(){return state.accounts.filter(a=>a.type==='investment'||a.type==='asset').reduce((s,a)=>s+accountBalance(a.id),0)}
+function monthTx(key){return state.transactions.filter(t=>monthKey(t.date)===key)}
+function monthlySummary(key){
+ const tx=monthTx(key);return {
+  income:tx.filter(t=>t.type==='income').reduce((s,t)=>s+Number(t.amount),0),
+  spending:tx.filter(t=>t.type==='expense').reduce((s,t)=>s+Number(t.amount),0),
+  invested:tx.filter(t=>t.type==='investment_contribution').reduce((s,t)=>s+Number(t.amount),0),
+  withdrawals:tx.filter(t=>t.type==='withdrawal').reduce((s,t)=>s+Number(t.amount),0)
+ }
+}
+function recurringMonthly(item){const a=Number(item.amount||0);return item.frequency==='monthly'?a:item.frequency==='quarterly'?a/3:a/12}
+function recurringTotals(){
+ return state.recurringItems.filter(x=>x.isActive!==false).reduce((o,x)=>{const v=recurringMonthly(x);o[x.type]=(o[x.type]||0)+v;return o},{income:0,expense:0,investment:0})
+}
+function renderPage(page){
+ if(page==='overview')renderOverview();
+ if(page==='money')renderMoney();
+ if(page==='investments')renderInvestments();
+ if(page==='goals')renderGoals();
+ if(page==='future')renderFuture();
+ if(page==='recurring')renderRecurring();
+ if(page==='liabilities')renderLiabilities();
+ if(page==='reports')renderReports();
+ if(page==='settings')renderSettings();
+}
+function renderAll(){renderOverview();renderMoney();renderInvestments();renderGoals();renderFuture();renderRecurring();renderLiabilities();renderReports();renderSettings();document.getElementById('todayLabel').textContent=new Date().toLocaleDateString(undefined,{weekday:'long',month:'long',year:'numeric'});}
+function renderOverview(){
+ const nw=netWorth(),m=monthlySummary(monthKey(today())),rt=recurringTotals();
+ document.getElementById('ovNetWorth').textContent=money(nw.net);document.getElementById('ovAssets').textContent=money(nw.assets);document.getElementById('ovLiabilities').textContent=money(nw.liab);
+ document.getElementById('ovIncome').textContent=money(m.income);document.getElementById('ovSpending').textContent=money(m.spending);document.getElementById('ovInvested').textContent=money(m.invested);document.getElementById('ovSurplus').textContent=money(m.income-m.spending-m.invested);
+ const by={};monthTx(monthKey(today())).filter(t=>t.type==='expense').forEach(t=>by[t.category]=(by[t.category]||0)+Number(t.amount));
+ const cats=Object.entries(by).sort((a,b)=>b[1]-a[1]).slice(0,5),max=cats[0]?.[1]||1;
+ document.getElementById('ovBars').innerHTML=cats.length?cats.map(([k,v])=>`<div class="bar-row"><span>${esc(k)}</span><div class="bar"><i style="width:${Math.max(3,v/max*100)}%"></i></div><b>${money(v)}</b></div>`).join(''):'<div class="empty">No expenses recorded this month.<br>Tap + Add when money moves.</div>';
+ document.getElementById('ovCommitments').innerHTML=`<div class="commit"><div><b>Recurring income</b><br><span class="small">Expected monthly equivalent</span></div><div class="right green strong">${money(rt.income)}</div></div><div class="commit"><div><b>Recurring expenses</b><br><span class="small">Expected monthly equivalent</span></div><div class="right strong">${money(rt.expense)}</div></div><div class="commit"><div><b>Investments</b><br><span class="small">Expected monthly contribution</span></div><div class="right strong">${money(rt.investment)}</div></div>`;
+ const acc=[...state.accounts].sort((a,b)=>accountBalance(b.id)-accountBalance(a.id)).slice(0,6);
+ document.getElementById('ovAccounts').innerHTML=acc.length?acc.map(a=>`<div class="account-card"><div class="account-icon">${a.type==='cash'?'₹':'◆'}</div><div><div class="strong">${esc(a.name)}</div><div class="small">${esc(a.investmentCategory||'Cash')}</div></div><div class="value"><b>${money(accountBalance(a.id))}</b></div></div>`).join(''):'<div class="empty">Add your real opening balances during setup.</div>';
+ const goals=[...state.goals].sort((a,b)=>(b.currentAmount/b.targetAmount)-(a.currentAmount/a.targetAmount)).slice(0,3);
+ document.getElementById('ovGoals').innerHTML=goals.length?goals.map(goalHTML).join(''):'<div class="empty">No goals yet.</div>';
+ const tx=[...monthTx(monthKey(today()))].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,6);
+ document.getElementById('ovTransactions').innerHTML=tx.length?tx.map(txHTML).join(''):'<div class="empty">No actual transactions this month.<br>Tap + Add when money moves.</div>';
+}
+function goalHTML(g){const pct=g.targetAmount>0?Math.min(100,Math.max(0,g.currentAmount/g.targetAmount*100)):0;return `<div class="goal"><div class="goal-top"><b>${esc(g.name)}</b><span class="small">${Math.round(pct)}%</span></div><div class="progress"><i style="width:${pct}%"></i></div><div class="goal-meta"><span>${money(g.currentAmount)} of ${money(g.targetAmount)}</span><span>${g.targetDate?esc(g.targetDate):'No date'}</span></div></div>`}
+function txHTML(t){
+ const positive=t.type==='income'||t.type==='withdrawal',sign=positive?'+':'−',icon=t.type==='expense'?'↗':t.type==='income'?'↙':t.type==='investment_contribution'?'◆':'↙';
+ return `<div class="list-row"><div class="tx-icon">${icon}</div><div><div class="tx-title">${esc(t.category||t.type)}</div><div class="tx-date">${esc(t.date)}${t.note?' · '+esc(t.note):''}</div></div><div class="right strong ${positive?'green':'peach'}">${sign}${money(t.amount)}</div></div>`
+}
+let moneyMonthKey=monthKey(today());
+function shiftMonth(n){const d=new Date(moneyMonthKey+'-01T12:00:00');d.setMonth(d.getMonth()+n);moneyMonthKey=d.toISOString().slice(0,7);renderMoney()}
+function renderMoney(){
+ const m=monthlySummary(moneyMonthKey),tx=[...monthTx(moneyMonthKey)].sort((a,b)=>b.date.localeCompare(a.date));
+ document.getElementById('moneyMonth').textContent=monthName(moneyMonthKey);document.getElementById('mIncome').textContent=money(m.income);document.getElementById('mSpending').textContent=money(m.spending);document.getElementById('mInvested').textContent=money(m.invested);document.getElementById('mSurplus').textContent=money(m.income-m.spending-m.invested);document.getElementById('moneyCount').textContent=`${tx.length} actual transaction${tx.length===1?'':'s'}`;
+ document.getElementById('moneyTransactions').innerHTML=tx.length?tx.map(t=>txHTML(t)+`<div style="text-align:right;margin-top:-7px"><button class="link" onclick="deleteTx('${t.id}')">Delete</button></div>`).join(''):'<div class="empty">Nothing recorded for this month.</div>';
+}
+function openAdd(){setTxType('expense');document.getElementById('txModal').classList.add('show')}
+function setTxType(t){
+ document.querySelectorAll('.add-tabs button').forEach(b=>b.classList.toggle('active',b.dataset.type===t));
+ const accountOptions=state.accounts.filter(a=>a.type!=='cash');
+ let cats=t==='expense'?EXPENSE_CATS:t==='income'?INCOME_CATS:INVESTMENT_CATS;
+ let catHtml=cats.map(c=>`<option>${esc(c)}</option>`).join('');
+ document.getElementById('txForm').innerHTML=`
+ <div class="form-grid">
+  <div class="field"><label>Amount</label><input id="txAmount" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0"></div>
+  <div class="field"><label>${t==='income'?'Income source':'Category'}</label><select id="txCategory">${catHtml}</select></div>
+  ${t==='investment_contribution'||t==='withdrawal'?`<div class="field full"><label>Investment account</label><select id="txAccount">${accountOptions.length?accountOptions.map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join(''):'<option value="">Add an investment account first</option>'}</select></div>`:''}
+  <div class="field"><label>Date</label><input id="txDate" type="date" value="${today()}"></div>
+  <div class="field"><label>Note (optional)</label><input id="txNote" placeholder="Optional note"></div>
+ </div>
+ <div class="actions"><button class="btn" onclick="closeModal('txModal')">Cancel</button><button class="btn primary" onclick="saveTransaction('${t}')">Save transaction</button></div>`;
+}
+function saveTransaction(t){
+ const amount=Number(document.getElementById('txAmount').value);if(!(amount>0))return toast('Enter a valid amount.');
+ if((t==='investment_contribution'||t==='withdrawal')&&!document.getElementById('txAccount').value)return toast('Add an investment account first.');
+ state.transactions.push({id:uid(),type:t,amount,currency:state.settings.currency,category:document.getElementById('txCategory').value,accountId:document.getElementById('txAccount')?.value||null,date:document.getElementById('txDate').value||today(),note:document.getElementById('txNote').value.trim(),createdAt:new Date().toISOString()});
+ save();closeModal('txModal');renderAll();toast('Transaction saved');
+}
+function deleteTx(id){if(!confirm('Delete this transaction?'))return;state.transactions=state.transactions.filter(t=>t.id!==id);save();renderAll();toast('Transaction deleted')}
+function renderInvestments(){
+ const total=investmentTotal();document.getElementById('invTotal').textContent=money(total);
+ const acc=state.accounts.filter(a=>a.type==='investment'||a.type==='asset');
+ document.getElementById('investmentAccounts').innerHTML=acc.length?acc.map(a=>`<section class="card"><div class="account-card"><div class="account-icon">◆</div><div><h3>${esc(a.name)}</h3><div class="small">${esc(a.investmentCategory||'Other')}</div></div><div class="value"><b>${money(accountBalance(a.id))}</b><small>Opening ${money(a.openingBalance)}</small></div></div><div class="actions"><button class="btn" onclick="editAccount('${a.id}')">Edit</button><button class="btn danger" onclick="deleteAccount('${a.id}')">Delete</button></div></section>`).join(''):'<div class="card"><div class="empty">No investment accounts yet. Add your real opening balances.</div></div>';
+ const tx=state.transactions.filter(t=>t.type==='investment_contribution'||t.type==='withdrawal').sort((a,b)=>b.date.localeCompare(a.date)).slice(0,10);
+ document.getElementById('investmentActivity').innerHTML=tx.length?tx.map(txHTML).join(''):'<div class="empty">No investment activity yet.</div>';
+}
+function openAccountModal(id){
+ const a=id?state.accounts.find(x=>x.id===id):null;
+ document.getElementById('genericContent').innerHTML=`<h2>${a?'Edit':'Add'} investment account</h2><div class="form-grid">
+ <div class="field"><label>Name</label><input id="aName" value="${esc(a?.name||'')} " placeholder="e.g. Mutual Funds"></div>
+ <div class="field"><label>Category</label><select id="aCat">${INVESTMENT_CATS.map(x=>`<option ${x===(a?.investmentCategory||'Mutual Funds')?'selected':''}>${x}</option>`).join('')}</select></div>
+ <div class="field"><label>Opening balance</label><input id="aOpening" type="number" min="0" value="${a?.openingBalance??0}"></div>
+ </div><div class="notice" style="margin-top:12px"><b>Opening balance is a historical starting value.</b> Once created, normal transactions change the tracked balance; they do not overwrite the opening balance.</div>
+ <div class="actions"><button class="btn" onclick="closeModal('genericModal')">Cancel</button><button class="btn primary" onclick="saveAccount('${id||''}')">Save account</button></div>`;
+ openModal('genericModal')
+}
+function editAccount(id){openAccountModal(id)}
+function saveAccount(id){
+ const name=document.getElementById('aName').value.trim(),opening=Number(document.getElementById('aOpening').value||0);if(!name)return toast('Enter an account name.');
+ if(id){const a=state.accounts.find(x=>x.id===id);a.name=name;a.investmentCategory=document.getElementById('aCat').value}else state.accounts.push({id:uid(),name,type:'investment',investmentCategory:document.getElementById('aCat').value,openingBalance:opening,currency:state.settings.currency,createdAt:new Date().toISOString()});
+ save();closeModal('genericModal');renderAll();toast(id?'Account updated':'Account added')
+}
+function deleteAccount(id){if(!confirm('Delete this investment account? Existing transactions linked to it will also be removed.'))return;state.accounts=state.accounts.filter(a=>a.id!==id);state.transactions=state.transactions.filter(t=>t.accountId!==id);save();renderAll();toast('Account deleted')}
+function renderRecurring(){
+ const rt=recurringTotals();document.getElementById('recurringSummary').innerHTML=`<div class="card metric"><div class="k">RECURRING INCOME</div><div class="v green">${money(rt.income)}</div><div class="hint">Monthly equivalent</div></div><div class="card metric"><div class="k">RECURRING EXPENSES</div><div class="v peach">${money(rt.expense)}</div><div class="hint">Monthly equivalent</div></div><div class="card metric"><div class="k">RECURRING INVESTMENTS</div><div class="v">${money(rt.investment)}</div><div class="hint">Monthly equivalent</div></div>`;
+ document.getElementById('recurringList').innerHTML=state.recurringItems.length?state.recurringItems.map(x=>`<div class="list-row"><div class="tx-icon">${x.type==='income'?'↙':x.type==='expense'?'↗':'◆'}</div><div><div class="tx-title">${esc(x.name)}</div><div class="tx-date">${esc(x.category||'')} · ${esc(x.frequency)} · ${x.isActive===false?'Inactive':'Active'}</div></div><div class="right"><div class="strong">${money(x.amount)}</div><div class="small">${x.frequency}</div></div><button class="btn" onclick="editRecurring('${x.id}')">Edit</button><button class="btn danger" onclick="deleteRecurring('${x.id}')">Delete</button></div>`).join(''):'<div class="empty">No recurring definitions yet.</div>';
+}
+function openRecurringModal(id){
+ const x=id?state.recurringItems.find(y=>y.id===id):null;
+ document.getElementById('genericContent').innerHTML=`<h2>${x?'Edit':'Add'} recurring item</h2><div class="form-grid">
+ <div class="field"><label>Name</label><input id="rName" value="${esc(x?.name||'')}" placeholder="e.g. Salary"></div>
+ <div class="field"><label>Type</label><select id="rType"><option value="income" ${x?.type==='income'?'selected':''}>Income</option><option value="expense" ${x?.type==='expense'?'selected':''}>Expense</option><option value="investment" ${x?.type==='investment'?'selected':''}>Investment</option></select></div>
+ <div class="field"><label>Amount</label><input id="rAmount" type="number" min="0" value="${x?.amount??0}"></div>
+ <div class="field"><label>Frequency</label><select id="rFreq">${['monthly','quarterly','yearly'].map(f=>`<option ${x?.frequency===f?'selected':''}>${f}</option>`).join('')}</select></div>
+ <div class="field full"><label>Category</label><input id="rCat" value="${esc(x?.category||'')}" placeholder="Category / source"></div>
+ </div><div class="notice" style="margin-top:12px"><b>Recurring definitions are expectations.</b> They do not create actual transactions or change balances until an actual transaction is recorded.</div>
+ <div class="actions"><button class="btn" onclick="closeModal('genericModal')">Cancel</button><button class="btn primary" onclick="saveRecurring('${id||''}')">Save</button></div>`;
+ openModal('genericModal')
+}
+function editRecurring(id){openRecurringModal(id)}
+function saveRecurring(id){
+ const name=document.getElementById('rName').value.trim(),amount=Number(document.getElementById('rAmount').value||0);if(!name||amount<0)return toast('Enter valid recurring details.');
+ const obj={id:id||uid(),name,type:document.getElementById('rType').value,amount,frequency:document.getElementById('rFreq').value,category:document.getElementById('rCat').value.trim(),isActive:true};
+ if(id)state.recurringItems=state.recurringItems.map(x=>x.id===id?{...x,...obj}:x);else state.recurringItems.push(obj);save();closeModal('genericModal');renderAll();toast(id?'Recurring item updated':'Recurring item added')
+}
+function deleteRecurring(id){if(!confirm('Delete this recurring definition?'))return;state.recurringItems=state.recurringItems.filter(x=>x.id!==id);save();renderAll();toast('Recurring item deleted')}
+function renderLiabilities(){
+ const total=state.liabilities.reduce((s,l)=>s+Number(l.currentOutstanding||0),0);document.getElementById('liabTotal').textContent=money(total);
+ document.getElementById('liabilityList').innerHTML=state.liabilities.length?state.liabilities.map(l=>`<div class="list-row"><div class="tx-icon">−</div><div><div class="tx-title">${esc(l.name)}</div><div class="tx-date">${esc(l.type)}${l.emi?' · EMI '+money(l.emi):''}${l.interestRate!=null?' · '+l.interestRate+'% p.a.':''}</div></div><div class="right"><div class="strong red">${money(l.currentOutstanding)}</div><div class="small">Outstanding</div></div><button class="btn" onclick="editLiability('${l.id}')">Edit</button><button class="btn danger" onclick="deleteLiability('${l.id}')">Delete</button></div>`).join(''):'<div class="empty">No liabilities recorded.</div>';
+}
+function openLiabilityModal(id){
+ const l=id?state.liabilities.find(y=>y.id===id):null;
+ document.getElementById('genericContent').innerHTML=`<h2>${l?'Edit':'Add'} liability</h2><div class="form-grid">
+ <div class="field"><label>Name</label><input id="lName" value="${esc(l?.name||'')}" placeholder="e.g. Home loan"></div>
+ <div class="field"><label>Type</label><select id="lType">${LIAB_TYPES.map(t=>`<option ${l?.type===t?'selected':''}>${t}</option>`).join('')}</select></div>
+ <div class="field"><label>Current outstanding</label><input id="lOut" type="number" min="0" value="${l?.currentOutstanding??0}"></div>
+ <div class="field"><label>EMI</label><input id="lEmi" type="number" min="0" value="${l?.emi??0}"></div>
+ <div class="field"><label>Annual interest rate %</label><input id="lRate" type="number" min="0" step="0.01" value="${l?.interestRate??0}"></div>
+ </div><div class="actions"><button class="btn" onclick="closeModal('genericModal')">Cancel</button><button class="btn primary" onclick="saveLiability('${id||''}')">Save</button></div>`;
+ openModal('genericModal')
+}
+function editLiability(id){openLiabilityModal(id)}
+function saveLiability(id){
+ const name=document.getElementById('lName').value.trim();if(!name)return toast('Enter a liability name.');
+ const obj={id:id||uid(),name,type:document.getElementById('lType').value,currentOutstanding:Number(document.getElementById('lOut').value||0),emi:Number(document.getElementById('lEmi').value||0),interestRate:Number(document.getElementById('lRate').value||0)};
+ if(id)state.liabilities=state.liabilities.map(x=>x.id===id?obj:x);else state.liabilities.push(obj);save();closeModal('genericModal');renderAll();toast(id?'Liability updated':'Liability added')
+}
+function deleteLiability(id){if(!confirm('Delete this liability?'))return;state.liabilities=state.liabilities.filter(x=>x.id!==id);save();renderAll();toast('Liability deleted')}
+function renderGoals(){
+ document.getElementById('goalsList').innerHTML=state.goals.length?state.goals.map(g=>`<section class="card"><div class="card-head"><div><h2>${esc(g.name)}</h2><p>${g.targetDate?`Target ${esc(g.targetDate)}`:'No target date'}</p></div><span class="pill">${g.targetAmount>0?Math.min(100,Math.max(0,g.currentAmount/g.targetAmount*100)).toFixed(0):0}%</span></div>${goalHTML(g)}<div class="actions"><button class="btn" onclick="editGoal('${g.id}')">Edit</button><button class="btn danger" onclick="deleteGoal('${g.id}')">Delete</button></div></section>`).join(''):'<div class="card"><div class="empty">No goals yet.<br>Create a target you care about.</div></div>';
+}
+function openGoalModal(id){
+ const g=id?state.goals.find(y=>y.id===id):null;
+ document.getElementById('genericContent').innerHTML=`<h2>${g?'Edit':'Create'} goal</h2><div class="form-grid">
+ <div class="field full"><label>Name</label><input id="gName" value="${esc(g?.name||'')}" placeholder="Emergency fund, home, travel..."></div>
+ <div class="field"><label>Target amount</label><input id="gTarget" type="number" min="0" value="${g?.targetAmount??0}"></div>
+ <div class="field"><label>Current amount</label><input id="gCurrent" type="number" min="0" value="${g?.currentAmount??0}"></div>
+ <div class="field full"><label>Target date</label><input id="gDate" type="date" value="${g?.targetDate||''}"></div>
+ </div><div class="actions"><button class="btn" onclick="closeModal('genericModal')">Cancel</button><button class="btn primary" onclick="saveGoal('${id||''}')">Save</button></div>`;
+ openModal('genericModal')
+}
+function editGoal(id){openGoalModal(id)}
+function saveGoal(id){
+ const name=document.getElementById('gName').value.trim();if(!name)return toast('Enter a goal name.');
+ const obj={id:id||uid(),name,targetAmount:Number(document.getElementById('gTarget').value||0),currentAmount:Number(document.getElementById('gCurrent').value||0),targetDate:document.getElementById('gDate').value||''};
+ if(id)state.goals=state.goals.map(x=>x.id===id?obj:x);else state.goals.push(obj);save();closeModal('genericModal');renderAll();toast(id?'Goal updated':'Goal created')
+}
+function deleteGoal(id){if(!confirm('Delete this goal?'))return;state.goals=state.goals.filter(x=>x.id!==id);save();renderAll();toast('Goal deleted')}
+function projection(years,assumptions){
+ const months=Math.min(360,Math.max(12,Math.round(years*12))),income0=state.recurringItems.filter(x=>x.type==='income'&&x.isActive!==false).reduce((s,x)=>s+recurringMonthly(x),0);
+ const expense0=state.recurringItems.filter(x=>x.type==='expense'&&x.isActive!==false).reduce((s,x)=>s+recurringMonthly(x),0);
+ const invest0=state.recurringItems.filter(x=>x.type==='investment'&&x.isActive!==false).reduce((s,x)=>s+recurringMonthly(x),0);
+ const cash0=cashBalance(),inv0=investmentTotal();let cash=cash0,inv=inv0,debt=state.liabilities.reduce((s,l)=>s+Number(l.currentOutstanding||0),0);
+ const pts=[{m:0,net:cash+inv-debt,invest:inv,debt,cash,income:income0,expense:expense0,surplus:income0-expense0-invest0}];
+ const ig=Math.pow(1+assumptions.income/100,1/12)-1,eg=Math.pow(1+assumptions.expense/100,1/12)-1,ir=Math.pow(1+assumptions.return/100,1/12)-1;
+ for(let m=1;m<=months;m++){
+  const inc=income0*Math.pow(1+ig,m),exp=expense0*Math.pow(1+eg,m),contrib=invest0;
+  inv=inv*(1+ir)+contrib;
+  let emiTotal=0;
+  state.liabilities.forEach(l=>{
+    let bal=Number(l.currentOutstanding||0), rate=Number(l.interestRate||0)/100/12,emi=Number(l.emi||0);
+    // Reconstruct remaining balance for each month from the original balance.
+    for(let k=1;k<=m;k++){if(bal<=0)break;const interest=bal*rate,principal=emi-interest;if(emi<=0)break;if(principal<=0){bal=bal;break}bal=Math.max(0,bal-principal)}
+    emiTotal+=Math.min(Number(l.emi||0),bal>0?Number(l.emi||0):0);
+  });
+  debt=state.liabilities.reduce((sum,l)=>{
+    let bal=Number(l.currentOutstanding||0),rate=Number(l.interestRate||0)/100/12,emi=Number(l.emi||0);
+    for(let k=1;k<=m;k++){if(bal<=0)break;if(emi<=0)break;const interest=bal*rate,principal=emi-interest;if(principal<=0)break;bal=Math.max(0,bal-principal)}return sum+bal
+  },0);
+  const surplus=inc-exp-emiTotal-contrib;cash+=surplus;
+  pts.push({m,net:cash+inv-debt,invest:inv,debt,cash,income:inc,expense:exp,surplus});
+ }
+ return {pts,months,income0,expense0,invest0}
+}
+let projYears=5,ass={income:10,expense:7,return:12};
+function renderFuture(){
+ const el=document.getElementById('futureContent');
+ if(!state.futureUnlocked){el.innerHTML=`<div class="unlock"><h2>Unlock your financial outlook</h2><p>See how your current financial position, recurring commitments and chosen assumptions could evolve over time. This is a projection only and never changes your actual data.</p><button class="btn" onclick="unlockFuture()">Explore my future</button></div>`;return}
+ const p=projection(projYears,ass),last=p.pts[p.pts.length-1],nw=netWorth(),delta=last.net-nw.net;
+ const presets=[['Conservative',6,8,8],['Expected',10,7,12],['Optimistic',15,5,15]];
+ el.innerHTML=`<section class="card"><div class="card-head"><div><h2>Projection horizon</h2><p>Monthly simulation · maximum 30 years</p></div><span class="pill">${projYears} years</span></div>
+ <div class="scenario">${[1,3,5,10,20,30].map(y=>`<button class="${projYears===y?'active':''}" onclick="setYears(${y})">${y}Y</button>`).join('')}</div>
+ <div style="margin-top:15px" class="range-row"><input type="range" min="1" max="30" value="${projYears}" oninput="projYears=Number(this.value);renderFuture()"><div class="rate">${projYears}Y</div></div></section>
+ <section class="hero section-gap"><div class="label">PROJECTED NET WORTH</div><div class="networth">${money(last.net)}</div><div class="hero-meta"><span>Today <b>${money(nw.net)}</b></span><span>Delta <b>${delta>=0?'+':''}${money(delta)}</b></span></div></section>
+ <section class="card section-gap"><div class="card-head"><div><h2>Trajectory</h2><p>Projection based on selected assumptions</p></div></div><div id="projectionChart" class="chart"></div><div class="legend"><span style="color:var(--primary)">Net worth</span><span style="color:var(--accent)">Investments</span><span style="color:var(--danger)">Debt</span></div></section>
+ <div class="grid two section-gap"><section class="card"><div class="card-head"><div><h2>Assumptions</h2><p>Adjustable; actual data is untouched.</p></div></div>
+ ${[['Income growth','income',0,20],['Expense inflation','expense',0,15],['Investment return','return',0,20]].map(([n,k,min,max])=>`<div style="margin:15px 0"><div class="range-row"><div><b>${n}</b><div class="small">Annual rate</div></div><div class="rate">${ass[k]}%</div></div><input style="width:100%;accent-color:var(--primary)" type="range" min="${min}" max="${max}" step=".5" value="${ass[k]}" oninput="ass.${k}=Number(this.value);renderFuture()"></div>`).join('')}
+ <div class="scenario">${presets.map(x=>`<button onclick="setScenario('${x[0]}',${x[1]},${x[2]},${x[3]})">${x[0]}</button>`).join('')}<button class="active">Custom</button></div></section>
+ <section class="card"><div class="card-head"><div><h2>Financial position</h2><p>Today vs projected</p></div></div><div id="futureTable"></div></section></div>
+ <section class="card section-gap"><div class="card-head"><div><h2>Monthly cash flow</h2><p>Projected year-end monthly run rate</p></div></div><div id="futureCashflow"></div></section>
+ <section class="card section-gap"><div class="card-head"><div><h2>Loan projections</h2><p>Estimated payoff and amortization behavior</p></div></div><div id="loanProjection"></div></section>
+ <section class="card section-gap"><div class="card-head"><div><h2>Milestones</h2><p>Events detected within the selected horizon</p></div></div><div id="milestones"></div></section>
+ <div class="notice section-gap"><b>What drives your projection?</b><br>Income growth, expense inflation and investment return are user-selected assumptions. Recurring SIP/EPF-style contributions are treated as investments, not expenses. EMI is handled by the loan model and is not inflated as ordinary spending. Projections never modify actual accounts, transactions or liabilities.</div>
+ <div class="notice section-gap">Projection is illustrative, not financial advice. It is not a forecast or guarantee of future returns.</div>`;
+ renderProjectionDetails(p,nw);
+}
+function unlockFuture(){state.futureUnlocked=true;save();renderFuture();toast('Financial outlook unlocked')}
+function setYears(y){projYears=y;renderFuture()}
+function setScenario(n,i,e,r){ass={income:i,expense:e,return:r};renderFuture();toast(n+' scenario selected')}
+function renderProjectionDetails(p,nw){
+ const last=p.pts[p.pts.length-1], el=document.getElementById('projectionChart');
+ const w=900,h=250,pad=25, vals=p.pts, max=Math.max(...vals.map(x=>x.net),...vals.map(x=>x.invest),...vals.map(x=>x.debt),1),min=Math.min(0,...vals.map(x=>x.net),...vals.map(x=>x.debt));
+ const xy=(v,i)=>[pad+(w-2*pad)*(i/(vals.length-1)),h-pad-(h-2*pad)*((v-min)/(max-min||1))];
+ const path=(key)=>vals.map((v,i)=>{const [x,y]=xy(v[key],i);return (i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)}).join(' ');
+ el.innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><line x1="${pad}" y1="${h-pad}" x2="${w-pad}" y2="${h-pad}" stroke="#e5e1d6"/><path d="${path('net')}" fill="none" stroke="#315f52" stroke-width="3"/><path d="${path('invest')}" fill="none" stroke="#d78369" stroke-width="2"/><path d="${path('debt')}" fill="none" stroke="#c8564d" stroke-width="2"/></svg>`;
+ document.getElementById('futureTable').innerHTML=`<div class="table-wrap"><table class="table"><tr><th></th><th>Today</th><th>${projYears}Y</th></tr><tr><td>Net worth</td><td>${money(nw.net)}</td><td>${money(last.net)}</td></tr><tr><td>Investments</td><td>${money(investmentTotal())}</td><td>${money(last.invest)}</td></tr><tr><td>Cash</td><td>${money(cashBalance())}</td><td>${money(last.cash)}</td></tr><tr><td>Debt</td><td>${money(nw.liab)}</td><td>${money(last.debt)}</td></tr><tr><td>Monthly income</td><td>${money(p.income0)}</td><td>${money(last.income)}</td></tr><tr><td>Monthly expenses</td><td>${money(p.expense0)}</td><td>${money(last.expense)}</td></tr></table></div>`;
+ document.getElementById('futureCashflow').innerHTML=`<div class="grid three"><div><div class="small">INCOME</div><h2 class="green">${money(last.income)}</h2></div><div><div class="small">EXPENSES</div><h2 class="peach">${money(last.expense)}</h2></div><div><div class="small">SURPLUS AFTER EMI + INVESTMENTS</div><h2 class="${last.surplus>=0?'green':'red'}">${money(last.surplus)}</h2></div></div>`;
+ document.getElementById('loanProjection').innerHTML=state.liabilities.filter(l=>l.emi>0).length?state.liabilities.filter(l=>l.emi>0).map(l=>{
+  let bal=Number(l.currentOutstanding||0),rate=Number(l.interestRate||0)/100/12,months=0,negative=false;
+  while(bal>0&&months<360){const interest=bal*rate,principal=Number(l.emi)-interest;if(principal<=0){negative=true;break}bal=Math.max(0,bal-principal);months++}
+  return `<div class="list-row"><div><div class="tx-title">${esc(l.name)}</div><div class="tx-date">${esc(l.type)} · EMI ${money(l.emi)}</div></div><div class="right">${negative?'<span class="red strong">Negative amortization</span>':bal<=0?`<span class="green strong">Payoff in ~${months} months</span>`:`<span class="strong">~${months} months</span>`}</div></div>`
+ }).join(''):'<div class="empty">Add loans with EMI and interest rate to see payoff projections.</div>';
+ const milestones=[];const double=nw.net>0?nw.net*2:null;const first=double?p.pts.find(x=>x.net>=double):null;if(first)milestones.push(`Net worth doubles in ~${Math.ceil(first.m/12*10)/10} years`);state.liabilities.forEach(l=>{if(l.emi>0){let b=Number(l.currentOutstanding),r=Number(l.interestRate)/100/12,m=0;while(b>0&&m<360){let i=b*r,p=Number(l.emi)-i;if(p<=0)break;b=Math.max(0,b-p);m++}if(b<=0)milestones.push(`${l.name} payoff in ~${Math.ceil(m/12*10)/10} years`)}});[1000000,2500000,5000000,10000000].forEach(t=>{const hit=p.pts.find(x=>x.invest>=t);if(hit)milestones.push(`Investments reach ${money(t)} in ~${Math.ceil(hit.m/12*10)/10} years`)});const neg=p.pts.find(x=>x.cash<0);if(neg)milestones.push(`Projected cash becomes negative in ~${Math.ceil(neg.m/12*10)/10} years`);document.getElementById('milestones').innerHTML=milestones.length?milestones.map(x=>`<div class="list-row"><span class="pill">Milestone</span><div>${esc(x)}</div></div>`).join(''):'<div class="empty">No milestones detected within the selected horizon.</div>';
+}
+function renderReports(){
+ const keys=[];const d=new Date(monthKey(today())+'-01T12:00:00');for(let i=5;i>=0;i--){const x=new Date(d);x.setMonth(d.getMonth()-i);keys.push(x.toISOString().slice(0,7))}
+ const vals=keys.map(k=>({k,...monthlySummary(k)})),w=900,h=250,pad=30,max=Math.max(1,...vals.flatMap(x=>[x.income,x.spending]));
+ const barW=90,gap=45,scale=(h-55)/max;
+ document.getElementById('reportTrend').innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${vals.map((x,i)=>{const base=h-28,x0=pad+i*(barW+gap),ih=x.income*scale,sh=x.spending*scale;return `<rect x="${x0}" y="${base-ih}" width="34" height="${ih}" rx="5" fill="#315f52"/><rect x="${x0+42}" y="${base-sh}" width="34" height="${sh}" rx="5" fill="#d78369"/><text x="${x0+37}" y="${h-7}" text-anchor="middle" font-size="11" fill="#707775">${x.k.slice(5)}</text>`}).join('')}<line x1="25" y1="${h-28}" x2="${w-10}" y2="${h-28}" stroke="#e5e1d6"/></svg><div class="legend"><span style="color:var(--primary)">Income</span><span style="color:var(--accent)">Spending</span></div>`;
+ const m=monthlySummary(monthKey(today())),by={};monthTx(monthKey(today())).filter(t=>t.type==='expense').forEach(t=>by[t.category]=(by[t.category]||0)+Number(t.amount));const cats=Object.entries(by).sort((a,b)=>b[1]-a[1]),maxc=cats[0]?.[1]||1;
+ document.getElementById('reportCategories').innerHTML=cats.length?cats.map(([k,v])=>`<div class="bar-row"><span>${esc(k)}</span><div class="bar"><i style="width:${v/maxc*100}%"></i></div><b>${money(v)}</b></div>`).join(''):'<div class="empty">No spending recorded this month.</div>';
+ document.getElementById('reportSummary').innerHTML=`<div class="commit"><span>Income</span><b class="green">${money(m.income)}</b></div><div class="commit"><span>Spending</span><b class="peach">${money(m.spending)}</b></div><div class="commit"><span>Invested</span><b>${money(m.invested)}</b></div><div class="commit"><span>Surplus</span><b class="${m.income-m.spending-m.invested>=0?'green':'red'}">${money(m.income-m.spending-m.invested)}</b></div>`;
+}
+function renderSettings(){
+ document.getElementById('currencySelect').value=state.settings.currency;
+ const p=state.profile;document.getElementById('settingsProfile').innerHTML=`<div class="grid three"><div><div class="small">MONTHLY INCOME</div><b>${money(p.monthlyIncome||0)}</b></div><div><div class="small">ESSENTIAL SPENDING</div><b>${money(p.essentialSpending||0)}</b></div><div><div class="small">VARIABLE SPENDING</div><b>${money(p.variableSpending||0)}</b></div></div><div class="notice" style="margin-top:14px">${state.setupDate?'Initial setup recorded on '+esc(state.setupDate)+'.':'Setup has not been completed.'}</div>`;
+}
+function changeCurrency(c){state.settings.currency=c;save();renderAll();toast('Display currency changed')}
+function openProfileModal(){
+ const p=state.profile||{};
+ document.getElementById('genericContent').innerHTML=`<h2>Edit financial profile</h2><div class="form-grid">
+ <div class="field"><label>Monthly income</label><input id="pIncome" type="number" value="${p.monthlyIncome??0}"></div>
+ <div class="field"><label>Essential monthly spending</label><input id="pEssential" type="number" value="${p.essentialSpending??0}"></div>
+ <div class="field"><label>Variable monthly spending</label><input id="pVariable" type="number" value="${p.variableSpending??0}"></div>
+ </div><div class="notice" style="margin-top:12px"><b>Profile values are reference information.</b> Actual balances and monthly totals come from accounts and transactions. Editing this profile does not rewrite history.</div><div class="actions"><button class="btn" onclick="closeModal('genericModal')">Cancel</button><button class="btn primary" onclick="saveProfile()">Save</button></div>`;
+ openModal('genericModal')
+}
+function saveProfile(){state.profile.monthlyIncome=Number(document.getElementById('pIncome').value||0);state.profile.essentialSpending=Number(document.getElementById('pEssential').value||0);state.profile.variableSpending=Number(document.getElementById('pVariable').value||0);save();closeModal('genericModal');renderAll();toast('Profile updated')}
+function exportData(){
+ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='finora-backup-'+today()+'.json';a.click();URL.revokeObjectURL(a.href);toast('Backup exported')
+}
+function importData(e){
+ const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=()=>{try{const x=JSON.parse(r.result);if(!x||typeof x!=='object'||!Array.isArray(x.accounts)||!Array.isArray(x.transactions)||!Array.isArray(x.liabilities)||!Array.isArray(x.goals))throw Error();state=migrate(x);save();renderAll();toast('Backup imported')}catch{alert('Invalid Finora backup. Import cancelled.')}};r.readAsText(file);e.target.value=''}
+function deleteAllData(){if(!confirm('Delete ALL Finora data from this device? This cannot be undone unless you have an exported backup.'))return;localStorage.removeItem(STORE);state=defaultState();renderAll();startOnboarding();toast('All data deleted')}
+function startOnboarding(){
+ if(state.onboardingCompleted){document.getElementById('onboarding').classList.remove('show');return}
+ let step=0;
+ const steps=[
+  {title:"Let's set up your Finora.",lead:"A few real numbers are enough to create your starting financial picture. You can add more detail later.",fields:`<div class="field"><label>Display currency</label><select id="sCurrency">${Object.keys(CURRENCIES).map(c=>`<option ${c==='INR'?'selected':''}>${c}</option>`).join('')}</select></div>`},
+  {title:"What do you have today?",lead:"Enter your actual opening balances. These become historical starting values and are not silently overwritten.",fields:`<div class="form-grid"><div class="field"><label>Cash / bank balance</label><input id="sCash" type="number" min="0" placeholder="0"></div><div class="field"><label>Mutual funds</label><input id="sMF" type="number" min="0" placeholder="0"></div><div class="field"><label>Stocks / ETFs</label><input id="sStocks" type="number" min="0" placeholder="0"></div><div class="field"><label>EPF / PPF / NPS</label><input id="sRetire" type="number" min="0" placeholder="0"></div><div class="field"><label>FD / RD / Gold / Other assets</label><input id="sOtherAssets" type="number" min="0" placeholder="0"></div></div>`},
+  {title:"What do you owe today?",lead:"Use current outstanding amounts. Loan EMI and interest are optional but help the future outlook.",fields:`<div class="notice">You can skip debt if you have none.</div><div class="form-grid" style="margin-top:12px"><div class="field"><label>Home loan</label><input id="sHome" type="number" min="0" placeholder="0"></div><div class="field"><label>Car loan</label><input id="sCar" type="number" min="0" placeholder="0"></div><div class="field"><label>Personal loan</label><input id="sPersonal" type="number" min="0" placeholder="0"></div><div class="field"><label>Education loan</label><input id="sEdu" type="number" min="0" placeholder="0"></div><div class="field"><label>Credit card</label><input id="sCC" type="number" min="0" placeholder="0"></div><div class="field"><label>Other debt</label><input id="sOtherDebt" type="number" min="0" placeholder="0"></div></div>`},
+  {title:"What comes in each month?",lead:"Add your usual recurring income. This is used as your current financial profile and future baseline.",fields:`<div class="field"><label>Monthly income</label><input id="sIncome" type="number" min="0" placeholder="0"></div><div class="small" style="margin-top:8px">You can add multiple income sources later from Recurring.</div>`},
+  {title:"What goes out every month?",lead:"Start with the recurring commitments you know: rent, EMI, insurance, subscriptions and similar expenses.",fields:`<div class="form-grid"><div class="field"><label>Fixed / recurring expenses</label><input id="sFixed" type="number" min="0" placeholder="0"></div><div class="field"><label>Typical variable spending</label><input id="sVariable" type="number" min="0" placeholder="0"></div><div class="field"><label>Monthly investments / SIP / EPF</label><input id="sInvest" type="number" min="0" placeholder="0"></div></div>`},
+  {title:"What are you working toward?",lead:"Goals are optional. Add only what matters to you now.",fields:`<div class="form-grid"><div class="field"><label>Goal name</label><input id="sGoalName" placeholder="Emergency fund, home, travel..."></div><div class="field"><label>Target amount</label><input id="sGoalTarget" type="number" min="0" placeholder="0"></div><div class="field"><label>Current amount</label><input id="sGoalCurrent" type="number" min="0" placeholder="0"></div><div class="field"><label>Target date</label><input id="sGoalDate" type="date"></div></div>`},
+  {title:"Review your starting picture.",lead:"These values will become your actual starting financial state. You can edit profile information later; opening balances are preserved as historical values.",fields:`<div id="sSummary"></div>`}
+ ];
+ function renderStep(){
+  document.getElementById('setupProgress').style.width=((step+1)/steps.length*100)+'%';
+  const s=steps[step];document.getElementById('setupContent').innerHTML=`<h1>${s.title}</h1><p class="lead">${s.lead}</p><div class="setup-card">${s.fields}</div><div class="setup-actions"><button class="btn ${step===0?'ghost':''}" onclick="${step?'prevStep()':'skipSetup()'}">${step?'Back':'Skip setup'}</button><div class="right"><button class="btn primary" onclick="${step===steps.length-1?'finishSetup()':'nextStep()'}">${step===steps.length-1?'Finish setup':'Continue'}</button></div></div>`;
+  if(step===steps.length-1)fillSummary();
+ }
+ function nextStep(){captureStep(step);step++;renderStep()}
+ function prevStep(){captureStep(step);step--;renderStep()}
+ function captureStep(s){
+  const val=id=>Number(document.getElementById(id)?.value||0);
+  if(s===0)state.settings.currency=document.getElementById('sCurrency')?.value||'INR';
+  if(s===1){state.__setup={...(state.__setup||{}),cash:val('sCash'),mf:val('sMF'),stocks:val('sStocks'),retire:val('sRetire'),otherAssets:val('sOtherAssets')}}
+  if(s===2){state.__setup={...(state.__setup||{}),home:val('sHome'),car:val('sCar'),personal:val('sPersonal'),edu:val('sEdu'),cc:val('sCC'),otherDebt:val('sOtherDebt')}}
+  if(s===3)state.__setup={...(state.__setup||{}),income:val('sIncome')};
+  if(s===4)state.__setup={...(state.__setup||{}),fixed:val('sFixed'),variable:val('sVariable'),invest:val('sInvest')};
+  if(s===5)state.__setup={...(state.__setup||{}),goalName:document.getElementById('sGoalName')?.value||'',goalTarget:val('sGoalTarget'),goalCurrent:val('sGoalCurrent'),goalDate:document.getElementById('sGoalDate')?.value||''};
+ }
+ function fillSummary(){
+  const x=state.__setup||{},asset=(x.cash||0)+(x.mf||0)+(x.stocks||0)+(x.retire||0)+(x.otherAssets||0),debt=(x.home||0)+(x.car||0)+(x.personal||0)+(x.edu||0)+(x.cc||0)+(x.otherDebt||0);
+  document.getElementById('sSummary').innerHTML=`<div class="grid three"><div><div class="small">OPENING ASSETS</div><h2>${money(asset)}</h2></div><div><div class="small">OPENING DEBT</div><h2 class="red">${money(debt)}</h2></div><div><div class="small">OPENING NET WORTH</div><h2 class="green">${money(asset-debt)}</h2></div></div><div class="notice" style="margin-top:14px">Opening balances will be stored as historical values. Actual transactions will change tracked balances from that starting point.</div>`;
+ }
+ function finishSetup(){captureStep(step);const x=state.__setup||{},cur=state.settings.currency;state.accounts=[];const add=(name,type,cat,opening)=>{if(opening>0)state.accounts.push({id:uid(),name,type,investmentCategory:cat||null,openingBalance:opening,currency:cur,createdAt:new Date().toISOString()})};add('Cash / Bank','cash','Cash',x.cash||0);add('Mutual Funds','investment','Mutual Funds',x.mf||0);add('Stocks / ETFs','investment','Stocks / ETF',x.stocks||0);add('EPF / PPF / NPS','investment','EPF / PPF / NPS',x.retire||0);add('Other Assets','asset','Other',x.otherAssets||0);
+ const debtMap=[['Home Loan','Home Loan','home'],['Car Loan','Car Loan','car'],['Personal Loan','Personal Loan','personal'],['Education Loan','Education Loan','edu'],['Credit Card','Credit Card','cc'],['Other Debt','Other','otherDebt']];state.liabilities=debtMap.filter(([n,t,k])=>x[k]>0).map(([name,type,k])=>({id:uid(),name,type,currentOutstanding:x[k],emi:0,interestRate:0}));
+ state.profile={monthlyIncome:x.income||0,essentialSpending:x.fixed||0,variableSpending:x.variable||0};
+ if(x.income>0)state.recurringItems.push({id:uid(),name:'Monthly income',type:'income',amount:x.income,frequency:'monthly',category:'Salary',isActive:true});
+ if(x.fixed>0)state.recurringItems.push({id:uid(),name:'Fixed monthly expenses',type:'expense',amount:x.fixed,frequency:'monthly',category:'Essential',isActive:true});
+ if(x.variable>0)state.recurringItems.push({id:uid(),name:'Typical variable spending',type:'expense',amount:x.variable,frequency:'monthly',category:'Variable',isActive:true});
+ if(x.invest>0)state.recurringItems.push({id:uid(),name:'Monthly investments',type:'investment',amount:x.invest,frequency:'monthly',category:'SIP / Investment',isActive:true});
+ if(x.goalName&&x.goalTarget>0)state.goals.push({id:uid(),name:x.goalName,targetAmount:x.goalTarget,currentAmount:x.goalCurrent||0,targetDate:x.goalDate||''});
+ state.onboardingCompleted=true;state.setupDate=today();delete state.__setup;save();document.getElementById('onboarding').classList.remove('show');renderAll();toast('Finora is ready')}
+ function skipSetup(){if(!confirm('Skip setup for now? You can start with an empty financial state and add everything later.'))return;state.onboardingCompleted=true;state.setupDate=today();save();document.getElementById('onboarding').classList.remove('show');renderAll()}
+ window.prevStep=prevStep;window.nextStep=nextStep;window.captureStep=captureStep;window.finishSetup=finishSetup;window.skipSetup=skipSetup;
+ document.getElementById('onboarding').classList.add('show');renderStep();
+}
+renderAll();startOnboarding();
+</script>
+</body>
+</html>
